@@ -8,14 +8,15 @@ use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Yajra\DataTables\DataTables;
 
 class EventController extends Controller
 {
     public function createToken($event_id)
     {
         $absen = Absen::where("user_id", Auth::id())
-            ->where("event_id", $event_id);
-        if ($absen) {
+            ->where("event_id", $event_id)->get();
+        if (!$absen) {
             $newAbsen = Absen::create([
                 'user_id' => Auth::id(),
                 'event_id' => $event_id,
@@ -29,7 +30,7 @@ class EventController extends Controller
 
     public function resendToken($event_id)
     {
-        $qrCode = \QrCode::format('png')->size(200)->generate(['user_id' => Auth::id(), 'event_id' => $event_id]);
+        $qrCode = \QrCode::format('png')->size(200)->generate(json_encode(['user_id' => Auth::id(), 'event_id' => $event_id]));
         Mail::to(Auth::user()->email)->send(new EventMail(Auth::user(), $qrCode));
         return redirect('/home')->with('status', "Token berhasil dikirim ulang ke email");
     }
@@ -57,9 +58,19 @@ class EventController extends Controller
      */
     public function index()
     {
-        $events = Event::whereDate('tanggal', '>=', now());
+        return view('admin.event.index');
+    }
 
-        return $events;
+    public function dataTables()
+    { //::whereDate('tanggal', '>=', now()
+        return DataTables::of(Event::query())
+            ->addColumn('edit_url', function ($row) {
+                return url('admin/event/edit/' . $row->event_id);
+            })
+            ->addColumn('delete_url', function ($row) {
+                return url('admin/event/delete/' . $row->event_id);
+            })
+            ->make(true);
     }
 
     /**
@@ -69,7 +80,7 @@ class EventController extends Controller
      */
     public function create()
     {
-
+        return view('admin.event.create');
     }
 
     /**
@@ -80,17 +91,16 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        return dd($request->all());
         $validate = $request->validate([
             'nama' => 'required|string',
             'deskripsi' => 'required|string',
             'tempat' => 'required|string',
-            'tanggal' => 'required|date',
-            'tanggal' => 'required|integer',
+            'tanggal' => 'required|date_format:Y-m-d H:i:s',
+            'durasi' => 'required|integer',
         ]);
-        $event = Event::create($request->all());
+        $event = Event::create($request->except('_token'));
 
-        return redirect('/event')->with('status', 'Berhasil membuat event');
+        return redirect('/admin/event')->with('status', 'Berhasil membuat event');
     }
 
     /**
@@ -110,9 +120,10 @@ class EventController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($event_id)
     {
-        //
+        $data['event'] = Event::find($event_id);
+        return view('admin.event.edit', $data);
     }
 
     /**
@@ -122,9 +133,18 @@ class EventController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $event_id)
     {
-        //
+        $validate = $request->validate([
+            'nama' => 'required|string',
+            'deskripsi' => 'required|string',
+            'tempat' => 'required|string',
+            'tanggal' => 'required|date_format:Y-m-d H:i:s',
+            'durasi' => 'required|integer',
+        ]);
+        $event = Event::where('event_id', $event_id)->update($request->except('_token', '_method'));
+
+        return redirect('/admin/event')->with('status', 'Berhasil mengubah event');
     }
 
     /**
@@ -133,8 +153,11 @@ class EventController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($event_id)
     {
-        //
+        $event = Event::find($event_id);
+        $event->delete();
+
+        return redirect('/admin/event')->with('status', 'Berhasil menghapus event');
     }
 }

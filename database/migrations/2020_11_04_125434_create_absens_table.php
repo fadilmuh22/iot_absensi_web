@@ -14,13 +14,13 @@ class CreateAbsensTable extends Migration
     public function up()
     {
         Schema::create('absens', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('absen_id');
 
             $table->unsignedBigInteger('user_id')->index();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
 
             $table->unsignedBigInteger('event_id')->index();
-            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
+            $table->foreign('event_id')->references('event_id')->on('events')->onDelete('cascade');
 
             $table->boolean("hadir")->default(false);
             $table->dateTime("waktu_hadir")->nullable();

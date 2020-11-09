@@ -11,7 +11,8 @@
     <title>Absen Four</title>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -42,6 +43,8 @@
 
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ml-auto">
+
+
                         <!-- Authentication Links -->
                         @guest
                         @if (Route::has('login'))
@@ -55,7 +58,16 @@
                             <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
                         </li>
                         @endif
+
                         @else
+                        @if (Auth::user()->role == 'admin')
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url('admin') }}">Manage</a>
+                        </li>
+                        @endif
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url('home') }}">Home</a>
+                        </li>
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
