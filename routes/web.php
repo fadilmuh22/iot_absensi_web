@@ -43,5 +43,6 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
         Route::get('/edit/{event_id}', [EventController::class, 'edit']);
         Route::put('/update/{event_id}', [EventController::class, 'update']);
         Route::delete('/delete/{event_id}', [EventController::class, 'destroy']);
+        Route::get('/export-absen/{event_id}', [EventController::class, 'exportAbsens']);
     });
 });

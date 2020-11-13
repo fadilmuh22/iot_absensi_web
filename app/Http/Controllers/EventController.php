@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AbsenExport;
 use App\Mail\EventMail;
 use App\Models\Absen;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\DataTables;
 
 class EventController extends Controller
@@ -150,5 +152,25 @@ class EventController extends Controller
         $event->delete();
 
         return redirect('/admin/event')->with('status', 'Berhasil menghapus event');
+    }
+
+    public function exportAbsens($event_id)
+    {
+        // $data = DB::table('events')
+        //     ->select([
+        //         'users.name',
+        //         'hadir',
+        //         'waktu_hadir'
+        //     ])
+        //     ->where('events.event_id', $event_id)
+        //     ->join('absens', function ($join) {
+        //         $join->on('absens.event_id', '=', 'events.event_id');
+        //     })
+        //     ->join('users', function ($join) {
+        //         $join->on('users.user_id', '=', 'absens.user_id');
+        //     })->get();
+
+        // return response()->json($data);
+        return Excel::download(new AbsenExport($event_id), 'absen.xlsx');
     }
 }

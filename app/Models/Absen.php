@@ -23,7 +23,7 @@ class Absen extends Model
         return $this->belongsTo('App\Models\Event');
     }
 
-    public function user()
+    public function users()
     {
         return $this->belongsTo('App\Models\User');
     }
