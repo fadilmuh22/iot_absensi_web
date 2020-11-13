@@ -16,22 +16,24 @@ class EventController extends Controller
     {
         $absen = Absen::where("user_id", Auth::id())
             ->where("event_id", $event_id)->get();
-        if (!$absen) {
+        if ($absen->isEmpty()) {
             $newAbsen = Absen::create([
                 'user_id' => Auth::id(),
                 'event_id' => $event_id,
             ]);
+            $event = Event::find($event_id);
             $qrCode = \QrCode::format('png')->size(200)->generate(json_encode(['user_id' => Auth::id(), 'event_id' => $event_id]));
-            Mail::to(Auth::user()->email)->send(new EventMail(Auth::user(), $qrCode));
+            Mail::to(Auth::user()->email)->send(new EventMail(Auth::user(), $event, $qrCode));
             return redirect('/home')->with('status', "Token berhasil dibuat dan dikirim ke email");
         }
-        return redirect('/home')->with('status', "Token sudah dikirim");
+        return redirect('/home')->with('status', "Token telah dibuat");
     }
 
     public function resendToken($event_id)
     {
+        $event = Event::find($event_id);
         $qrCode = \QrCode::format('png')->size(200)->generate(json_encode(['user_id' => Auth::id(), 'event_id' => $event_id]));
-        Mail::to(Auth::user()->email)->send(new EventMail(Auth::user(), $qrCode));
+        Mail::to(Auth::user()->email)->send(new EventMail(Auth::user(), $event, $qrCode));
         return redirect('/home')->with('status', "Token berhasil dikirim ulang ke email");
     }
 
@@ -101,17 +103,6 @@ class EventController extends Controller
         $event = Event::create($request->except('_token'));
 
         return redirect('/admin/event')->with('status', 'Berhasil membuat event');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
     }
 
     /**

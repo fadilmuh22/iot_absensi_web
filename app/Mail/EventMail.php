@@ -10,16 +10,17 @@ class EventMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $user, $qrCode;
+    public $user, $event, $qrCode;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($user, $qrCode)
+    public function __construct($user, $event, $qrCode)
     {
         $this->user = $user;
+        $this->event = $event;
         $this->qrCode = $qrCode;
     }
 

@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->boolean('verified')->default(false);
+            $table->string('role')->default('user')->afer('verified');
             $table->timestamps();
         });
     }

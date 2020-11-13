@@ -1,36 +1,28 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid px-5">
     <div class="events-wrapper">
-        <p>Events</p>
-
-        <div class="events-container">
-            @foreach ($todayEvents as $event)
-            <div class="row event-item" onclick="window.location.href = '/event/{{$event->event_id}}';">
-                <div class="col-md-12">
-                    <div class="column">
-                        <div class="row justify-content-between">
-                            <div class="col">
-                                <p class="nama">{{$event->nama}}</p>
-                            </div>
-                            <div class="mr-3">
-                                <a href="" class="btn btn-primary">Register</a>
-                            </div>
-                        </div>
-                        <div class="row justify-content-between">
-                            <div class="col-md-6">
-                                <p class="tempat">{{$event->tempat}}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <p class="tempat text-end">{{$event->tanggal}}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <h1>{{$event->nama}}</h1>
+        <div class="row justify-content-between">
+            <div class="col">
+                <p class="nama">{{$event->tanggal}}</p>
             </div>
-            @endforeach
+            <div class="mr-3">
+                @if ($event->absen_user_id == null)
+                <a href="{{ url('create-token/'.$event->event_id) }}" class="btn btn-primary">Register</a>
+                @else
+                <a href="{{ url('resend-token/'.$event->event_id) }}" class="btn btn-success">Resend</a>
+                @endif
+            </div>
         </div>
+
+        <hr>
+
+        <div class="event-deskripsi mt-3">
+            {!! $event->deskripsi !!}
+        </div>
+
     </div>
 </div>
 @stop

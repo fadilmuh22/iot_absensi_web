@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -26,13 +26,27 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $data['todayEvents'] = Event::whereDate('tanggal', '=', now())->limit(3)->get();
+        $data['todayEvents'] = DB::table('events')
+            ->select([
+                'events.*',
+                'absens.event_id as absen_event_id',
+                'absens.user_id as absen_user_id',
+                'hadir',
+                'waktu_hadir',
+            ])
+            ->whereDate('tanggal', '=', now())
+            ->limit(3)
+            ->orderBy('tanggal')
+            ->leftJoin('absens', function ($join) {
+                $join->on('events.event_id', '=', 'absens.event_id')->where('absens.user_id', Auth::id());
+            })->get();
         $data['registeredEvents'] = DB::table('absens')
             ->select('events.*')
             ->join('events', 'events.event_id', '=', 'absens.event_id')
             ->where('absens.user_id', Auth::id())
             ->whereDate('events.tanggal', '>=', now())
             ->limit(3)
+            ->orderBy('tanggal')
             ->get();
         return view('home', $data);
     }
@@ -46,7 +60,8 @@ class HomeController extends Controller
                 'absens.user_id as absen_user_id',
                 'hadir',
                 'waktu_hadir',
-            ]);
+            ])
+            ->orderBy('tanggal');
 
         if ($request->query('today', false)) {
             $data['events'] = $data['events']->whereDate('events.tanggal', '>=', now());
@@ -69,7 +84,20 @@ class HomeController extends Controller
 
     public function event($event_id)
     {
-        $data['event'] = Event::find($event_id);
+        $data['event'] = DB::table('events')
+            ->select([
+                'events.*',
+                'absens.event_id as absen_event_id',
+                'absens.user_id as absen_user_id',
+                'hadir',
+                'waktu_hadir',
+            ])
+            ->where('events.event_id', $event_id)
+            ->leftJoin('absens', function ($join) {
+                $join->on('events.event_id', '=', 'absens.event_id')->where('absens.user_id', Auth::id());
+            })
+            ->limit(1)
+            ->get()[0];
         return view('event', $data);
     }
 }

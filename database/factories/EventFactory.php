@@ -22,7 +22,7 @@ class EventFactory extends Factory
     public function definition()
     {
         return [
-            'nama' => $this->faker->name,
+            'nama' => $this->faker->catchPhrase,
             'deskripsi' => $this->faker->paragraph(),
             'tempat' => $this->faker->address,
             'tanggal' => now(),
