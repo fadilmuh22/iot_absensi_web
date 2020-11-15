@@ -14,7 +14,8 @@ class CreateVerifyUsersTable extends Migration
     public function up()
     {
         Schema::create('verify_users', function (Blueprint $table) {
-            $table->bigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->index();
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
             $table->string('token');
             $table->timestamps();
         });

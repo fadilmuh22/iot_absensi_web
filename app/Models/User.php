@@ -45,7 +45,7 @@ class User extends Authenticatable
 
     public function verifyUser()
     {
-        return $this->hasOne('App\Models\VerifyUser');
+        return $this->hasOne('App\Models\VerifyUser', 'user_id', 'user_id');
     }
 
     public function absen()

@@ -41,7 +41,7 @@ class LoginController extends Controller
 
     public function authenticated(Request $request, $user)
     {
-        if (!$user->verified) {
+        if ($user->verified == 0) {
             auth()->logout();
             return back()->with('warning', 'You need to confirm your account. We have sent you an activation code, please check your email.');
         }

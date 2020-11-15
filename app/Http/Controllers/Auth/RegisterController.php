@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -73,11 +74,25 @@ class RegisterController extends Controller
             'password' => bcrypt($data['password']),
         ]);
         $verifyUser = VerifyUser::create([
-            'user_id' => $user->id,
+            'user_id' => $user['user_id'],
             'token' => sha1(time()),
         ]);
+
         Mail::to($user->email)->send(new VerifyMail($user));
         return $user;
+    }
+
+    public function authenticated(Request $request, $user) {
+        if (!$user->verified) {
+            auth()->logout();
+            return back()->with('warning', 'You need to confirm your account. We have sent you an activation code, please check your email.');
+        }
+        return redirect()->intended($this->redirectPath());
+    }
+
+    protected function registered(Request $request, $user) {
+        $this->guard()->logout();
+        return redirect('/login')->with('status', 'You need to confirm your account. We have sent you an activation code, please check your email.');
     }
 
     public function verifyUser($token)
