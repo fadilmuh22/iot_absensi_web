@@ -31,8 +31,23 @@
                                                 <a href="{{ url('create-token/'.$event->event_id) }}"
                                                     class="btn btn-primary">Register</a>
                                                 @else
-                                                <a href="{{ url('resend-token/'.$event->event_id) }}"
-                                                    class="btn btn-success">Resend</a>
+                                                <div class="form-inline">
+                                                    <a href="{{ url('resend-token/'.$event->event_id) }}"
+                                                        class="btn btn-success mr-1">Resend</a>
+
+                                                    <form action="{{ url('/event/delete/'.$event->absen_id) }}"
+                                                        method="post">
+                                                        @csrf
+                                                        @method('DELETE')
+
+                                                        <input type="hidden" name="user_id"
+                                                            value="{{$event->absen_user_id }}">
+                                                        <div class="form-group">
+                                                            <input type="submit" class="btn btn-info"
+                                                                value="Unregister">
+                                                        </div>
+                                                    </form>
+                                                </div>
                                                 @endif
                                             </div>
                                         </div>
@@ -71,8 +86,23 @@
                                                 <p class="nama">{{$event->nama}}</p>
                                             </div>
                                             <div class="mr-3">
-                                                <a href="{{ url('resend-token/'.$event->event_id) }}"
-                                                    class="btn btn-success">Resend</a>
+                                                <div class="form-inline">
+                                                    <a href="{{ url('resend-token/'.$event->event_id) }}"
+                                                        class="btn btn-success mr-1">Resend</a>
+
+                                                    <form action="{{ url('/event/delete/'.$event->absen_id) }}"
+                                                        method="post">
+                                                        @csrf
+                                                        @method('DELETE')
+
+                                                        <input type="hidden" name="user_id"
+                                                            value="{{$event->absen_user_id }}">
+                                                        <div class="form-group">
+                                                            <input type="submit" class="btn btn-info"
+                                                                value="Unregister">
+                                                        </div>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="row justify-content-between">

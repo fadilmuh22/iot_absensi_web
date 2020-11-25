@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Event;
+use App\Models\Absen;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +30,7 @@ class HomeController extends Controller
         $data['todayEvents'] = DB::table('events')
             ->select([
                 'events.*',
+                'absens.absen_id',
                 'absens.event_id as absen_event_id',
                 'absens.user_id as absen_user_id',
                 'hadir',
@@ -41,7 +43,11 @@ class HomeController extends Controller
                 $join->on('events.event_id', '=', 'absens.event_id')->where('absens.user_id', Auth::id());
             })->get();
         $data['registeredEvents'] = DB::table('absens')
-            ->select('events.*')
+            ->select([
+                'events.*',
+                'absens.absen_id',
+                'absens.user_id as absen_user_id',
+            ])
             ->join('events', 'events.event_id', '=', 'absens.event_id')
             ->where('absens.user_id', Auth::id())
             ->whereDate('events.tanggal', '>=', now())
@@ -56,6 +62,7 @@ class HomeController extends Controller
         $data['events'] = DB::table('events')
             ->select([
                 'events.*',
+                'absens.absen_id',
                 'absens.event_id as absen_event_id',
                 'absens.user_id as absen_user_id',
                 'hadir',
@@ -87,6 +94,7 @@ class HomeController extends Controller
         $data['event'] = DB::table('events')
             ->select([
                 'events.*',
+                'absens.absen_id',
                 'absens.event_id as absen_event_id',
                 'absens.user_id as absen_user_id',
                 'hadir',
@@ -99,5 +107,26 @@ class HomeController extends Controller
             ->limit(1)
             ->get()[0];
         return view('event', $data);
+    }
+
+    public function absenDelete(Request $request)
+    {
+        if (Auth::id() == $request->user_id) {
+            $absen = Absen::find($request->absen_id);
+            $absen->delete();
+
+            return redirect('/home')->with('status', 'Berhasil menghapus absen event');
+        }
+        return redirect('/home')->with('status', 'Tidak terotentikasi');
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $user = User::find(Auth::id());
+        $user->password = bcrypt($request->password);
+        $user->save();
+
+
+        return redirect('/admin')->with('status', 'Berhasil mereset password');
     }
 }

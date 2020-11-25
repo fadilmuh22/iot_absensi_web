@@ -8,6 +8,7 @@ use App\Models\Absen;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\DataTables;
@@ -66,8 +67,11 @@ class EventController extends Controller
     }
 
     public function dataTables()
-    { //::whereDate('tanggal', '>=', now()
+    {
         return DataTables::of(Event::query())
+            ->addColumn('absen_url', function ($row) {
+                return url('admin/event/absen-list/' . $row->event_id);
+            })
             ->addColumn('edit_url', function ($row) {
                 return url('admin/event/edit/' . $row->event_id);
             })
@@ -77,6 +81,43 @@ class EventController extends Controller
             ->make(true);
     }
 
+    public function absenList($event_id)
+    {
+        return view('admin.event.absen', ['event_id' => $event_id]);
+    }
+
+    public function absenJson($event_id)
+    {
+        $absenList = DB::table('events')
+            ->select([
+                'absens.absen_id',
+                'users.name',
+                'users.email',
+                'hadir',
+                'waktu_hadir'
+            ])
+            ->where('events.event_id', $event_id)
+            ->join('absens', function ($join) {
+                $join->on('absens.event_id', '=', 'events.event_id');
+            })
+            ->join('users', function ($join) {
+                $join->on('users.user_id', '=', 'absens.user_id');
+            });
+        // return response()->json($absenList);
+        return DataTables::of($absenList)
+            ->addColumn('delete_url', function ($row) {
+                return url('admin/event/absen-delete/' . $row->absen_id);
+            })
+            ->make(true);
+    }
+
+    public function absenDelete($absen_id)
+    {
+        $absen = Absen::find($absen_id);
+        $absen->delete();
+
+        return redirect('/admin/event/absen-list')->with('status', 'Berhasil menghapus absen event');
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -156,21 +197,6 @@ class EventController extends Controller
 
     public function exportAbsens($event_id)
     {
-        // $data = DB::table('events')
-        //     ->select([
-        //         'users.name',
-        //         'hadir',
-        //         'waktu_hadir'
-        //     ])
-        //     ->where('events.event_id', $event_id)
-        //     ->join('absens', function ($join) {
-        //         $join->on('absens.event_id', '=', 'events.event_id');
-        //     })
-        //     ->join('users', function ($join) {
-        //         $join->on('users.user_id', '=', 'absens.user_id');
-        //     })->get();
-
-        // return response()->json($data);
         return Excel::download(new AbsenExport($event_id), 'absen.xlsx');
     }
 }

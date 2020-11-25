@@ -2,15 +2,6 @@
 
 @section('title', 'Events')
 
-@section('content_header')
-<div class="container-fluid">
-    <div class="row justify-content-between">
-        <h1>Events</h1>
-        <a class="btn btn-primary" href="{{ url('admin/event/create')}}">Create</a>
-    </div>
-</div>
-@stop
-
 @section('content')
 @if (count($errors) > 0)
 <div class="alert alert-danger" role="alert">
@@ -28,11 +19,10 @@
     <thead>
         <tr>
             <th style="width: 5%;">Id</th>
-            <th style="width: 30;">Nama</th>
-            <th style="width: 45%">Deskripsi</th>
-            <th style="width: 20%;">Tempat</th>
-            <th style="width: 20%;">Tanggal</th>
-            <th style="width: 5%;">Durasi</th>
+            <th style="width: 45%">Nama User</th>
+            <th style="width: 20%;">Email User</th>
+            <th style="width: 5%;">Hadir</th>
+            <th style="width: 20%;">Waktu Hadir</th>
             <th style="width: 20%;">Action</th>
         </tr>
     </thead>
@@ -42,13 +32,13 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Hapus Event</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle">Hapus Absen</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                Hapus Event
+                Hapus Absen
                 <span style="font-weight: bolder !important; color: red;" id="wording-modal-delete"></span>
             </div>
             <div class="modal-footer">
@@ -74,41 +64,37 @@
             serverSide: true,
             scrollX: true,
             responsive: true,
-            ajax: "{{ url('admin/event/json') }}",
+            ajax: "{{ url('admin/event/absen-json/'.$event_id) }}",
             columns: [
-                { data: 'event_id', name: 'event_id' },
+                { data: 'absen_id', name: 'absen_id' },
                 {
-                    data: 'nama',
-                    name: 'nama',
+                    data: 'name',
+                    name: 'name',
                     render: function(data, type, row) {
                         return type === 'display' && data.length > 30 ? data.substr(0, 30) + '...' : data;
                     }
                 },
                 {
-                    data: 'deskripsi',
-                    name: 'deskripsi',
+                    data: 'email',
+                    name: 'email',
                     render: function(data, type, row) {
                         return type === 'display' && data.length > 60 ? stripHtml(data.substr(0, 60)) + '...' : stripHtml(data);
                     }
                 },
                 {
-                    data: 'tempat',
-                    name: 'tempat',
+                    data: 'hadir',
+                    name: 'hadir',
                 },
                 {
-                    data: 'tanggal',
-                    name: 'tanggal',
+                    data: 'waktu_hadir',
+                    name: 'waktu_hadir',
                 },
-
-                { data: 'durasi', name: 'durasi' },
                 {
                     data: null,
                     name: 'action',
                     render: function(data) {
-                        var absenBtn = '<a href="' + data.absen_url + '" class="btn btn-secondary mr-2 mb-1" role="button" aria-pressed="true">Absen</a>';
-                        var editBtn = '<a href="' + data.edit_url + '" class="btn btn-primary mr-2 mb-1" role="button" aria-pressed="true">Edit</a>';
-                        var deleteBtn = '<button class="btn btn-delete btn-danger mb-1" data-event-id="'+data.event_id+'" data-event-nama="'+data.nama+'" data-remote="'+ data.delete_url +'" data-toggle="modal" data-target="#deleteModal">Delete</button>';
-                        return '<div class="form-inline">' + absenBtn + editBtn + deleteBtn + '</div>';
+                        var deleteBtn = '<button class="btn btn-delete btn-danger mb-1" data-absen-id="'+data.absen_id+'" data-absen-nama="'+data.name+'" data-remote="'+ data.delete_url +'" data-toggle="modal" data-target="#deleteModal">Delete</button>';
+                        return '<div class="form-inline">' + deleteBtn + '</div>';
                     },
                     orderable: false,
                     searchable: false
@@ -121,8 +107,8 @@
 
         $('#deleteModal').on('show.bs.modal', function(e) {
             //get data-id attribute of the clicked element
-            const wording = " " + $(e.relatedTarget).data('event-nama') + " dengan id: " +$(e.relatedTarget).data('event-id');
-            console.log(" " + $(e.relatedTarget).data('event-nama') + "dengan id: " +$(e.relatedTarget).data('event-id'));
+            const wording = " " + $(e.relatedTarget).data('absen-nama') + " dengan id: " +$(e.relatedTarget).data('absen-id');
+            console.log(" " + $(e.relatedTarget).data('absen-nama') + "dengan id: " +$(e.relatedTarget).data('absen-id'));
 
             //populate the textbox
             $(e.currentTarget).find('#wording-modal-delete').html(wording);

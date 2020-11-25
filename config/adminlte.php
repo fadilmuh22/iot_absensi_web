@@ -236,7 +236,7 @@ return [
         //     'search' => true,
         //     'topnav' => true,
         // ],
-        // // [
+        // [
         //     'text' => 'blog',
         //     'url' => 'admin/blog',
         //     'can' => 'manage-blog',
@@ -253,17 +253,17 @@ return [
             'url' => 'admin/event',
             'icon' => 'far fa-fw fa-file',
         ],
-        // ['header' => 'account_settings'],
+        ['header' => 'account_settings'],
         // [
         //     'text' => 'profile',
         //     'url' => 'admin/settings',
         //     'icon' => 'fas fa-fw fa-user',
         // ],
-        // [
-        //     'text' => 'change_password',
-        //     'url' => 'admin/settings',
-        //     'icon' => 'fas fa-fw fa-lock',
-        // ],
+        [
+            'text' => 'change_password',
+            'url' => 'admin/settings',
+            'icon' => 'fas fa-fw fa-lock',
+        ],
         // [
         //     'text' => 'multilevel',
         //     'icon' => 'fas fa-fw fa-share',
