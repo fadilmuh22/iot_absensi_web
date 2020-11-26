@@ -2,6 +2,27 @@
 
 @section('title', 'Events')
 
+@section('content_header')
+<div class="container-fluid">
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="m-0 text-dark">{{$event->nama}}</h1>
+            <p class="nama">{{$event->tanggal}}</p>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">
+                    <a href="{{ url('/admin/event') }}">
+                        Event
+                    </a>
+                </li>
+                <li class="breadcrumb-item active">Absen Event</li>
+            </ol>
+        </div>
+    </div>
+</div>
+@stop
+
 @section('content')
 @if (count($errors) > 0)
 <div class="alert alert-danger" role="alert">
@@ -64,7 +85,7 @@
             serverSide: true,
             scrollX: true,
             responsive: true,
-            ajax: "{{ url('admin/event/absen-json/'.$event_id) }}",
+            ajax: "{{ url('admin/event/absen-json/'.$event->event_id) }}",
             columns: [
                 { data: 'absen_id', name: 'absen_id' },
                 {

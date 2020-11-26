@@ -23,6 +23,7 @@ class CreateAbsensTable extends Migration
             $table->foreign('event_id')->references('event_id')->on('events')->onDelete('cascade');
 
             $table->boolean("hadir")->default(false);
+            $table->integer("suhu_tubuh")->nullable();
             $table->dateTime("waktu_hadir")->nullable();
 
             $table->timestamps();

@@ -43,17 +43,13 @@ class EventController extends Controller
     public function absen(Request $request)
     {
         $absen = Absen::where("user_id", $request->user_id)
-            ->where("event_id", $request->event_id)->limit(1);
-
-        if ($absen) {
-            $absen->update([
+            ->where("event_id", $request->event_id)->limit(1)->update([
                 'hadir' => true,
+                'suhu_tubuh' => $request->suhu_tubuh,
                 'waktu_hadir' => now(),
             ]);
 
-            return true;
-        }
-        return false;
+        return $absen;
     }
 
     /**
@@ -83,7 +79,8 @@ class EventController extends Controller
 
     public function absenList($event_id)
     {
-        return view('admin.event.absen', ['event_id' => $event_id]);
+        $event = Event::find($event_id);
+        return view('admin.event.absen', ['event' => $event]);
     }
 
     public function absenJson($event_id)
